@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISAQ PHARMACEUTICALS - LIMS (Validated)</title>
+    <!-- External Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Your Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Tab Bar -->
+<div class="tab-bar no-print">
+    <button class="tab-button active" data-tab="daily-activity"><i class="fas fa-calendar-day"></i> Daily Activity Report</button>
+    <button class="tab-button" data-tab="sterility-log"><i class="fas fa-vial-virus"></i> Sterility Test Log</button>
+    <button class="tab-button" data-tab="lab-ledger"><i class="fas fa-book"></i> Lab Chemical Ledger</button>
+    
+    <!-- === NEW LINK TO TAGS PAGE === -->
+    <a href="tags.html" target="_blank" class="tab-button" style="text-decoration: none;">
+        <i class="fas fa-tags"></i> Label Generator
+    </a>
+</div>
+
+    <!-- DAILY ACTIVITY TAB -->
+    <div id="daily-activity-content" class="tab-content active">
+        <div class="header-container"><h1 id="company-name" contenteditable="true">MISAQ PHARMACEUTICALS</h1><h2>QUALITY CONTROL DEPARTMENT</h2><h3>DAILY PERFORMANCE REPORT</h3></div>
+        <div class="controls no-print">
+            <label>Date:</label><input type="text" id="report-date" class="flatpickr-input">
+            <label>Report History:</label><select id="history-select"></select>
+            <button class="print-btn" onclick="prepareAndPrint()"><i class="fas fa-print"></i> Print Report</button>
+        </div>
+        <div id="print-report-date-container" class="print-only">Report Date: <span id="print-report-date"></span></div>
+        <table class="daily-activity-table">
+            <thead><tr class="section-header"><th colspan="9">Chemical Testing Section</th></tr><tr><th>Sr#</th><th>Product Name</th><th>B#</th><th>Stage</th><th>Activity</th><th>Status</th><th>Section</th><th>Performed By</th><th>Remarks</th><th class="action-column no-print">Action</th></tr></thead>
+            <tbody id="chemical-table-body"></tbody>
+        </table>
+        <div class="controls no-print" style="justify-content: flex-start;"><button class="add-btn" data-action="add-row" data-table="chemical-table-body"><i class="fas fa-plus"></i> Add Row</button></div>
+        <table class="daily-activity-table">
+            <thead><tr class="section-header"><th colspan="9">Microbiology Section</th></tr><tr><th>Sr#</th><th>Product Name</th><th>B#</th><th>Stage</th><th>Activity</th><th>Status</th><th>Section</th><th>Performed By</th><th>Remarks</th><th class="action-column no-print">Action</th></tr></thead>
+            <tbody id="micro-table-body"></tbody>
+        </table>
+        <div class="signature-section print-only">
+            <div class="signature-block"><div class="signature-line"></div><strong>Prepared by:</strong></div>
+            <div class="signature-block"><div class="signature-line"></div><strong>Approved by:</strong></div>
+        </div>
+    </div>
+    
+    <!-- STERILITY LOG TAB -->
+    <div id="sterility-log-content" class="tab-content">
+        <div class="header-container"><h1>Sterility Test Record</h1></div>
+        <div class="controls no-print">
+            <input type="text" id="sterility-search" placeholder="Search by Product or Batch..." style="flex-grow: 1; max-width: 400px;">
+            <button class="add-btn" data-action="show-sterility-modal"><i class="fas fa-plus"></i> Add New Test</button>
+            <button class="print-btn" onclick="window.print()"><i class="fas fa-print"></i> Print Log</button>
+        </div>
+        <table>
+            <thead><tr><th>Sr#</th><th>Date</th><th>Product Name</th><th>Batch No.</th><th>Activity</th><th>End Date</th><th>Release Date</th><th>Sterility Status</th><th>BET Status</th><th>Remarks</th><th class="action-column no-print">Actions</th></tr></thead>
+            <tbody id="sterility-table-body"></tbody>
+        </table>
+    </div>
+
+    <!-- LAB LEDGER TAB -->
+    <div id="lab-ledger-content" class="tab-content">
+        <h2>Lab Chemical Ledger</h2>
+        <div class="controls-grid">
+            <button id="recordTestBtn" class="primary-action-btn"><i class="fas fa-flask"></i> Record Test Usage</button>
+            <button id="addReceiveBtn"><i class="fas fa-plus"></i> Add New Chemical Batch</button>
+            <button id="printMasterListBtn" class="print-btn"><i class="fas fa-print"></i> Print Master Inventory</button>
+            <button id="printLedgerBtn" class="print-btn"><i class="fas fa-print"></i> Print Full Ledger</button>
+            <button id="printLowStockBtn" class="print-btn"><i class="fas fa-print"></i> Print Low Stock List</button>
+            <button id="printExpiredBtn" class="print-btn" style="background-color: var(--danger-color);"><i class="fas fa-exclamation-triangle"></i> Print Expired List</button>
+        </div>
+        
+        <h3 style="margin-top: 30px;">Current Inventory</h3>
+        <input type="text" id="inventorySearch" placeholder="Search Inventory by Name or ID..." style="margin-bottom: 15px;">
+        
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Chemical Name</th>
+                    <th>CAS</th>
+                    <th>Total Quantity</th>
+                    <th>Locations</th>
+                    <th>Status</th>
+                    <th class="no-print">Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h3 style="margin-top: 30px;">Usage History Log</h3>
+        <input type="text" id="historyFilter" placeholder="Search Usage History by Batch, Test, or Chemical Name...">
+        <table id="historyTable">
+            <thead><tr><th>Date</th><th>Chemical</th><th>Amount Used</th><th>Test</th><th>Batch #</th><th class="no-print">Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- All Modals for all tabs -->
+<div id="sterility-modal" class="modal no-print">
+    <div class="modal-content">
+        <h2 id="modal-title">Add New Sterility Test</h2>
+        <form id="sterility-form">
+            <input type="hidden" id="sterility-id">
+            <div class="form-grid">
+                <div><label for="s-date">Date</label><input type="text" id="s-date" class="flatpickr-input" required></div>
+                <div><label for="s-productName">Product Name</label><input type="text" id="s-productName" required></div>
+                <div><label for="s-batchNumber">Batch No.</label><input type="text" id="s-batchNumber" required></div>
+                <div><label for="s-activity">Activity</label><input type="text" id="s-activity" value="Sterility Test"></div>
+                <div><label for="s-endDate">End Date</label><input type="text" id="s-endDate" class="flatpickr-input"></div>
+                <div><label for="s-releaseDate">Release Date</label><input type="text" id="s-releaseDate" class="flatpickr-input"></div>
+                <div><label for="s-sterilityStatus">Sterility Status</label><select id="s-sterilityStatus"><option>Pass</option><option>Fail</option><option>In-Progress</option></select></div>
+                <div><label for="s-betStatus">BET Status</label><select id="s-betStatus"><option>Pass</option><option>Fail</option><option>In-Progress</option></select></div>
+                <div class="full-width"><label for="s-remarks">Remarks</label><input type="text" id="s-remarks"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" data-action="close-modal">Cancel</button>
+                <button type="submit" class="save-btn"><i class="fas fa-save"></i> Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="addReceiveModal" class="modal no-print">
+    <div class="modal-content"><span class="close-btn" data-action="close-modal">&times;</span><h2 id="addReceiveTitle">Add New Chemical Batch</h2>
+    <form id="addReceiveForm">
+        <div class="form-grid">
+            <div><label>Chemical ID</label><input type="number" id="stockId" placeholder="e.g., 101" required></div>
+            <div><label>Chemical Name</label><input type="text" id="stockName" placeholder="Auto-fills for known ID" required></div>
+            <div><label>Batch Number</label><input type="text" id="stockBatchNumber" placeholder="e.g., B202501" required></div>
+            <div><label>Expiry Date</label><input type="text" id="stockExpiryDate" placeholder="Select a date" required></div>
+            <div><label>CAS Number</label><input type="text" id="stockCas" placeholder="Auto-fills for known ID"></div>
+            <div><label>Quantity Received</label><input type="number" id="stockQuantity" required min="0" step="any"></div>
+            <div><label>Unit</label><select id="stockBaseUnit" required><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="mL">mL</option></select></div>
+            <div><label>Low Stock Level (in base unit)</label><input type="number" id="stockReorderLevel" required min="0" step="any"></div>
+            <div class="full-width"><label>Storage Location</label><input type="text" id="stockLocation" value="Chemical Room"></div>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="cancel-btn" data-action="close-modal">Cancel</button>
+            <button type="submit" id="addReceiveSubmitBtn">Add New Batch</button>
+        </div>
+    </form></div>
+</div>
+<div id="testUsageModal" class="modal no-print">
+    <div class="modal-content">
+        <span class="close-btn" data-action="close-modal">&times;</span>
+        <h2>Record Usage for a Test / Batch</h2>
+        <form id="testUsageForm">
+            <div class="form-grid">
+                <div class="full-width"><label>Product / Test Name</label><input type="text" id="testName" placeholder="e.g., Paracetamol Assay" required></div>
+                <div class="full-width"><label>Batch Number (of Product)</label><input type="text" id="batchNumber" placeholder="e.g., PC2025-001" required></div>
+            </div>
+            <h3 style="margin-top:20px;">Chemicals Used</h3>
+            <div id="chemical-entry-container">
+                <!-- Chemical entry rows will be dynamically added by JS -->
+            </div>
+            <button type="button" id="addChemicalRowBtn" class="add-btn"><i class="fas fa-plus"></i> Add More Chemicals</button>
+            <div style="margin-top:20px;"></div>
+            <button type="submit" class="primary-action-btn" style="width:100%;">Submit & Deduct All</button>
+        </form>
+    </div>
+</div>
+<div id="editChemicalModal" class="modal no-print">
+    <div class="modal-content"><span class="close-btn" data-action="close-modal">&times;</span><h2>Edit Chemical Details</h2>
+    <form id="editChemicalForm">
+        <input type="hidden" id="editChemicalFbId">
+        <div class="form-group"><label>Chemical ID (Read-only)</label><input type="number" id="editChemicalId" readonly></div>
+        <div class="form-group"><label>Chemical Name</label><input type="text" id="editChemicalName" required></div>
+        <div class="form-group"><label>Batch Number</label><input type="text" id="editBatchNumber" required></div>
+        <div class="form-group"><label>Expiry Date</label><input type="text" id="editExpiryDate" required></div>
+        <div class="form-group"><label>CAS Number</label><input type="text" id="editCasNumber"></div>
+        <div class="form-group"><label>Current Quantity (Editable)</label><input type="number" id="editChemicalQuantity" step="any" required></div>
+        <div class="form-group"><label>Low Stock Level</label><input type="number" id="editReorderLevel" required min="0" step="any"></div>
+        <div class="form-group"><label>Storage Location</label><input type="text" id="editLocation"></div>
+        <button type="submit">Save Changes</button>
+    </form></div>
+</div>
+<div id="editHistoryModal" class="modal no-print">
+    <div class="modal-content"><span class="close-btn" data-action="close-modal">&times;</span><h2>Edit Usage History Entry</h2>
+    <form id="editHistoryForm">
+        <input type="hidden" id="editHistoryId">
+        <div class="form-group"><label>Chemical (Read-only)</label><input type="text" id="editHistoryChemical" readonly></div>
+        <div class="form-row">
+            <div class="form-group"><label>Amount Used (Editable)</label><input type="number" id="editHistoryAmount" step="any" required></div>
+            <div class="form-group"><label>Unit</label><select id="editHistoryUnit" required><option value="mg">mg</option><option value="g">g</option><option value="mL">mL</option><option value="L">L</option></select></div>
+        </div>
+        <div class="form-group"><label>Test / Product Name</label><input type="text" id="editHistoryTestName" required></div>
+        <div class="form-group"><label>Batch Number</label><input type="text" id="editHistoryBatchNumber" required></div>
+        <button type="submit">Save Changes</button>
+    </form></div>
+</div>
+
+<div id="autocomplete-box" class="autocomplete-container no-print"></div>
+<div id="connection-status" class="connection-status no-print">Connecting...</div>
+<div class="print-area" style="display:none;"></div>
+
+<!-- Scripts -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="firebase-config.js"></script>
+<script src="ledger-app.js"></script>
+<script src="report-app.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>
