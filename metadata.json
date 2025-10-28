@@ -1,0 +1,5 @@
+{
+  "name": "MISAQ LIMS",
+  "description": "A Laboratory Information Management System (LIMS) for MISAQ Pharmaceuticals, featuring daily activity reports, sterility logs, chemical ledger, label generator, and stability studies.",
+  "requestFramePermissions": []
+}
